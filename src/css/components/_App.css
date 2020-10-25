@@ -7,6 +7,7 @@
   .app__main,
   .app__central-container {
     margin-bottom: 2em;
+    margin-top: 2em;
   }
 
   .app__frames-container {

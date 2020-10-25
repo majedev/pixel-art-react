@@ -24,6 +24,7 @@ export default class PixelCell extends React.Component {
 
     return (
       <div
+        onContextMenu={(ev) => {ev.preventDefault();}}
         onMouseDown={ev => onMouseDown(id, ev)}
         onMouseOver={ev => onMouseOver(id, ev)}
         onFocus={ev => onMouseOver(id, ev)}

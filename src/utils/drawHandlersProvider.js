@@ -30,6 +30,7 @@ const getCellCoordinates = (id, columnsCount) => {
 const drawHandlersProvider = rootComponent => ({
   onMouseUp() {
     rootComponent.setState({
+      button: 0,
       dragging: false
     });
   },
@@ -40,8 +41,10 @@ const drawHandlersProvider = rootComponent => ({
         const { props } = gridComponent;
         if (props.drawingTool !== 'MOVE') {
           const actionProps = getCellActionProps(props, id);
+          actionProps.button = ev.button;
           if (!rootComponent.state.dragging) props.cellAction(actionProps);
           rootComponent.setState({
+            button: ev.button,
             dragging: true
           });
         }
@@ -52,7 +55,10 @@ const drawHandlersProvider = rootComponent => ({
         props.hoveredCell(getCellCoordinates(id, props.columns));
         if (props.drawingTool !== 'MOVE') {
           const actionProps = getCellActionProps(props, id);
-          if (rootComponent.state.dragging) props.cellAction(actionProps);
+          if (rootComponent.state.dragging) {
+            actionProps.button = rootComponent.state.button;
+            props.cellAction(actionProps);
+          }
         }
       },
       onTouchMove(ev) {

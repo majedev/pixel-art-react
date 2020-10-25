@@ -43,8 +43,13 @@ export function cellAction({
   color,
   paletteColor,
   columns,
-  rows
+  rows,
+  button
 }) {
+  if(button === 2 && drawingTool === "PENCIL") {
+    drawingTool = "ERASER"
+  }
+
   return {
     type: `APPLY_${drawingTool}`,
     id,

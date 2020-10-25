@@ -24,8 +24,45 @@ import CellsInfo from './CellsInfo';
 import UndoRedoContainer from './UndoRedo';
 import initialSetup from '../utils/startup';
 import drawHandlersProvider from '../utils/drawHandlersProvider';
+import { connect } from 'react-redux';
 
-export default class App extends React.Component {
+function RGBAToHexA(rgba) {
+  if(rgba.indexOf('#') === 0) {
+    const num = parseInt(rgba.replace('#', '0x'));
+    var b = num & 0xFF,
+        g = (num & 0xFF00) >>> 8,
+        r = (num & 0xFF0000) >>> 16,
+        a = ( (num & 0xFF000000) >>> 24 ) / 255 ;
+
+    return [r, g, b, a];
+  }
+
+  let sep = rgba.indexOf(",") > -1 ? "," : " ";
+  rgba = rgba.substr(5).split(")")[0].split(sep);
+                
+  // Strip the slash if using space-separated syntax
+  if (rgba.indexOf("/") > -1)
+    rgba.splice(3,1);
+
+  for (let R in rgba) {
+    let r = rgba[R];
+    if (r.indexOf("%") > -1) {
+      let p = r.substr(0,r.length - 1) / 100;
+
+      if (R < 3) {
+        rgba[R] = Number(Math.round(p * 255));
+      } else {
+        rgba[R] = Number(p);
+      }
+    } else {
+      rgba[R] = Number(rgba[R]);
+    }
+  }
+
+  return rgba;
+}
+
+class Appz extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -46,6 +83,50 @@ export default class App extends React.Component {
       modalType: type,
       modalOpen: true
     });
+  }
+
+  sendToRetroFrame() {
+    connect((store) => {
+      return {
+        auth: store.auth
+      }
+    })
+
+    const frames = this.props.frames;
+
+    // Clear the buffers
+    fetch("http://10.33.33.34/api/buffers", {
+      method: 'DELETE'
+    })
+
+    frames.forEach((frame, idx, framesArray) => {
+      const buf = [];
+
+      frame.get('grid').forEach((fillStyle, pixelIdx) => {
+        var rgba;
+        if (!fillStyle) {
+          rgba = [0, 0, 0, 0];
+        } else {
+          rgba = RGBAToHexA(fillStyle);
+        }
+
+        // 0 = r, 1 = g, 2 = b, 3 = a
+        buf.push(rgba[2], rgba[1], rgba[0], 1);
+      });
+
+      fetch("http://10.33.33.34/api/buffers", {
+        method: 'POST',
+        headers: {'Content-Type': 'data/binary'},
+        body: new Uint8Array(buf)
+      })
+    })
+
+    // Show
+    fetch("http://10.33.33.34/api/show/image", {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({"delay": 200}),
+    })
   }
 
   closeModal() {
@@ -167,13 +248,13 @@ export default class App extends React.Component {
                     type="button"
                     className="app__copycss-button"
                     onClick={() => {
-                      this.changeModalType('copycss');
+                      this.sendToRetroFrame();
                     }}
                     data-tooltip={
-                      helpOn ? 'Check your CSS generated code' : null
+                      helpOn ? 'Send to RetroFrame!' : null
                     }
                   >
-                    css
+                    show!
                   </button>
                 </div>
                 <div className="app__mobile--group">
@@ -266,41 +347,6 @@ export default class App extends React.Component {
             </div>
           </div>
         </div>
-        <div className="css-container">
-          <CssDisplayContainer />
-        </div>
-        <CookieConsent
-          location="bottom"
-          buttonText="Got it!"
-          cookieName="pixelartcssCookiesAccepted"
-          style={{
-            background: '#313131',
-            fontSize: '13px',
-            textAlign: 'center'
-          }}
-          buttonStyle={{
-            background: '#bbbbbb',
-            color: '#4e503b',
-            fontSize: '13px'
-          }}
-          contentStyle={{
-            flex: '1 0 200px',
-            margin: '15px'
-          }}
-          expires={150}
-        >
-          By continuing to use this website you are giving consent to cookies
-          being used. Thank you.
-          <a
-            href="https://www.jvalen.com/pixelartcss/cookies.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ textDecoration: 'none', color: '#5786c1' }}
-          >
-            {' '}
-            Learn more
-          </a>
-        </CookieConsent>
         <ModalContainer
           type={modalType}
           isOpen={modalOpen}
@@ -315,3 +361,14 @@ export default class App extends React.Component {
     );
   }
 }
+
+
+const mapStateToProps = state => {
+  const frames = state.present.get('frames');
+  return {
+    frames: frames.get('list'),
+  };
+};
+
+const App = connect(mapStateToProps)(Appz);
+export default App;

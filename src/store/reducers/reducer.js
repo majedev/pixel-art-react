@@ -6,7 +6,7 @@ import drawingToolReducer from './drawingToolReducer';
 import * as types from '../actions/actionTypes';
 
 function setInitialState(state) {
-  const cellSize = 10;
+  const cellSize = 1;
 
   const initialState = {
     cellSize,
