@@ -32,7 +32,7 @@ const createIncludedActions = () =>
 
 const configureStore = devMode => {
   let store;
-  if (devMode) {
+  if (true) {
     store = createStore(
       undoable(reducer, {
         filter: createIncludedActions(),

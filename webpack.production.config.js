@@ -2,6 +2,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const config = {
   mode: "production",
@@ -21,7 +22,11 @@ const config = {
     }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
-    })
+    }),
+    new HtmlWebpackPlugin({
+      template: './build/index.html',
+      inject: true
+    }),
   ],
   target: "web",
   stats: false,
