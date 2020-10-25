@@ -3,6 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const config = {
   mode: "production",
@@ -65,7 +66,18 @@ const config = {
     path: path.join(__dirname, '/deploy'),
     publicPath: '/',
     filename: 'bundle.js'
-  }
+  },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          output: {
+            comments: false,
+          },
+        },
+      }),
+    ],
+  },
 };
 
 module.exports = config;

@@ -97,7 +97,7 @@ class Appz extends React.Component {
     const frames = this.props.frames;
 
     // Clear the buffers
-    await fetch('http://10.33.33.34/api/buffers', {
+    await fetch(`http://${window.location.host}/api/buffers`, {
       method: 'DELETE'
     });
 
@@ -116,7 +116,7 @@ class Appz extends React.Component {
         buf.push(rgba[2], rgba[1], rgba[0], 1);
       });
 
-      await fetch('http://10.33.33.34/api/buffers', {
+      await fetch(`http://${window.location.host}/api/buffers`, {
         method: 'POST',
         headers: { 'Content-Type': 'data/binary' },
         body: new Uint8Array(buf)
@@ -124,7 +124,7 @@ class Appz extends React.Component {
     });
 
     // Show
-    await fetch('http://10.33.33.34/api/show/image', {
+    await fetch(`http://${window.location.host}/api/show/image`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ delay: 200 })
