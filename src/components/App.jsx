@@ -27,27 +27,29 @@ import drawHandlersProvider from '../utils/drawHandlersProvider';
 import { connect } from 'react-redux';
 
 function RGBAToHexA(rgba) {
-  if(rgba.indexOf('#') === 0) {
+  if (rgba.indexOf('#') === 0) {
     const num = parseInt(rgba.replace('#', '0x'));
-    var b = num & 0xFF,
-        g = (num & 0xFF00) >>> 8,
-        r = (num & 0xFF0000) >>> 16,
-        a = ( (num & 0xFF000000) >>> 24 ) / 255 ;
+    var b = num & 0xff,
+      g = (num & 0xff00) >>> 8,
+      r = (num & 0xff0000) >>> 16,
+      a = ((num & 0xff000000) >>> 24) / 255;
 
     return [r, g, b, a];
   }
 
-  let sep = rgba.indexOf(",") > -1 ? "," : " ";
-  rgba = rgba.substr(5).split(")")[0].split(sep);
-                
+  let sep = rgba.indexOf(',') > -1 ? ',' : ' ';
+  rgba = rgba
+    .substr(5)
+    .split(')')[0]
+    .split(sep);
+
   // Strip the slash if using space-separated syntax
-  if (rgba.indexOf("/") > -1)
-    rgba.splice(3,1);
+  if (rgba.indexOf('/') > -1) rgba.splice(3, 1);
 
   for (let R in rgba) {
     let r = rgba[R];
-    if (r.indexOf("%") > -1) {
-      let p = r.substr(0,r.length - 1) / 100;
+    if (r.indexOf('%') > -1) {
+      let p = r.substr(0, r.length - 1) / 100;
 
       if (R < 3) {
         rgba[R] = Number(Math.round(p * 255));
@@ -85,21 +87,21 @@ class Appz extends React.Component {
     });
   }
 
-  sendToRetroFrame() {
-    connect((store) => {
+  async sendToRetroFrame() {
+    connect(store => {
       return {
         auth: store.auth
-      }
-    })
+      };
+    });
 
     const frames = this.props.frames;
 
     // Clear the buffers
-    fetch("http://10.33.33.34/api/buffers", {
+    await fetch('http://10.33.33.34/api/buffers', {
       method: 'DELETE'
-    })
+    });
 
-    frames.forEach((frame, idx, framesArray) => {
+    frames.forEach(async (frame, idx, framesArray) => {
       const buf = [];
 
       frame.get('grid').forEach((fillStyle, pixelIdx) => {
@@ -114,19 +116,19 @@ class Appz extends React.Component {
         buf.push(rgba[2], rgba[1], rgba[0], 1);
       });
 
-      fetch("http://10.33.33.34/api/buffers", {
+      await fetch('http://10.33.33.34/api/buffers', {
         method: 'POST',
-        headers: {'Content-Type': 'data/binary'},
+        headers: { 'Content-Type': 'data/binary' },
         body: new Uint8Array(buf)
-      })
-    })
+      });
+    });
 
     // Show
-    fetch("http://10.33.33.34/api/show/image", {
+    await fetch('http://10.33.33.34/api/show/image', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({"delay": 200}),
-    })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ delay: 200 })
+    });
   }
 
   closeModal() {
@@ -250,9 +252,7 @@ class Appz extends React.Component {
                     onClick={() => {
                       this.sendToRetroFrame();
                     }}
-                    data-tooltip={
-                      helpOn ? 'Send to RetroFrame!' : null
-                    }
+                    data-tooltip={helpOn ? 'Send to RetroFrame!' : null}
                   >
                     show!
                   </button>
@@ -362,11 +362,10 @@ class Appz extends React.Component {
   }
 }
 
-
 const mapStateToProps = state => {
   const frames = state.present.get('frames');
   return {
-    frames: frames.get('list'),
+    frames: frames.get('list')
   };
 };
 
