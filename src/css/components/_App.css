@@ -20,7 +20,7 @@
   }
 
   .app__load-save-container {
-    margin-bottom: 2em;
+    margin-bottom: 1em;
 
     .app__load-button {
       @mixin button gray;
@@ -41,6 +41,20 @@
 
       width: 100%;
       margin-top: 1em;
+    }
+  }
+
+  .app__fps-container {
+    lost-utility: clearfix;
+
+    > input {
+      lost-column: 2/3 0 0;
+    }
+
+    > span {
+      lost-column: 1/3 0 0;
+      font-size: 10px;
+      text-align: right;
     }
   }
 

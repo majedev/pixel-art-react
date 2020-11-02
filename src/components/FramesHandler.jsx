@@ -88,6 +88,9 @@ class FramesHandler extends React.Component {
             onUpdate={() => {
               this.onScrollbarUpdate();
             }}
+            renderThumbHorizontal={props => (
+              <div {...props} className="track-horizontal" />
+            )}
           >
             <DragDropContext onDragEnd={this.onDragEnd}>
               <Droppable droppableId="droppable" direction="horizontal">

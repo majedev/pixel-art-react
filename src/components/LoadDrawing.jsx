@@ -57,6 +57,10 @@ export default class LoadDrawing extends React.Component {
   removeFromStorage(key, e) {
     const { actions, open, close } = this.props;
     e.stopPropagation();
+    if (!confirm('Are you really, really, really sure?')) {
+      return;
+    }
+
     if (browserStorage) {
       const removed = removeProjectFromStorage(browserStorage, key);
       if (removed) {

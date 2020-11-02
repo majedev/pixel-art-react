@@ -19,5 +19,11 @@
       flex-wrap: nowrap;
       padding-bottom: 0.5em;
     }
+
+    .track-horizontal {
+      cursor: pointer;
+      border-radius: inherit;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
   }
 }

@@ -70,6 +70,7 @@ class Appz extends React.Component {
     this.state = {
       modalType: null,
       modalOpen: false,
+      fps: 10,
       helpOn: false
     };
     Object.assign(this, drawHandlersProvider(this));
@@ -123,11 +124,14 @@ class Appz extends React.Component {
       });
     });
 
+    // Calc frame delay from fps
+    const delay = Math.round(1000 / this.state.fps);
+
     // Show
     await fetch(`http://${window.location.host}/api/show/image`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ delay: 200 })
+      body: JSON.stringify({ delay: delay })
     });
   }
 
@@ -143,7 +147,7 @@ class Appz extends React.Component {
   }
 
   render() {
-    const { helpOn, modalType, modalOpen } = this.state;
+    const { helpOn, modalType, modalOpen, fps } = this.state;
     return (
       <div
         className="app__main"
@@ -246,6 +250,18 @@ class Appz extends React.Component {
               </div>
               <div className="app__mobile--container max-width-container">
                 <div className="app__mobile--group">
+                  <div className="app__fps-container">
+                    <input
+                      type="range"
+                      min="1"
+                      max="30"
+                      value={fps}
+                      onChange={e => {
+                        this.setState({ fps: e.target.value });
+                      }}
+                    />
+                    <span>{fps} fps</span>
+                  </div>
                   <button
                     type="button"
                     className="app__copycss-button"
